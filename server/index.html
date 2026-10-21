@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+    <title>DevPulse: ask Alexa+ which commit broke your build</title>
+    <meta name="description"
+        content="DevPulse is an open source MCP server that lets Alexa+ answer questions about your GitHub Actions runs, pull requests and commits.">
+</head>
+
+<body>
+    <header>
+        <div class="wrap"><a class="mark" href="index.html">DevPulse</a>
+            <nav><a href="index.html#demo">Demo</a><a href="index.html#tools">Tools</a><a
+                    href="index.html#setup">Setup</a><a href="REPLACE_REPO_URL">Source</a></nav>
+        </div>
+    </header>
+    <main>
+        <div class="wrap">
+            <section class="hero">
+                <h1>Ask Alexa+ which commit broke your build.</h1>
+                <p class="lede">DevPulse is an MCP server for Alexa+. It reads your GitHub Actions runs, pull requests
+                    and commits, then answers in a few spoken sentences. It is written in Python, MIT licensed, and you
+                    host it yourself.</p>
+                <a class="btn" href="#setup">Read the setup steps</a><a href="REPLACE_REPO_URL">Source on GitHub</a>
+            </section>
+
+            <section class="row" id="demo">
+                <h2>Recorded answer</h2>
+                <div>
+                    <p>This question went through the DevPulse simulator to a running server, which called GitHub and
+                        Gemini. Repository: the public microsoft/vscode. Date: 19 October 2026. The answer is shown as
+                        returned.</p>
+                    <!-- Add the demo video embed here once it is recorded -->
+                    <div class="said"><span class="cap">Question</span>
+                        <p>What happened in the repo this week?</p>
+                    </div>
+                    <span class="cap" style="margin-top:1rem">Tool call sent to the server</span>
+                    <pre>get_repo_activity {"repo": "microsoft/vscode", "days": 7}</pre>
+                    <div class="said"><span class="cap">Answer</span>
+                        <p>The VS Code repository saw high activity this week with thirty commits and twenty-four new
+                            issues opened, but only one issue was closed. Five pull requests were submitted. Recent work
+                            focused on modern UI updates, fixing sandbox write confirmations, and optimizing Azure
+                            Pipeline test jobs.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="row" id="tools">
+                <h2>Tools</h2>
+                <div>
+                    <table>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Question</th>
+                            <th>Reads</th>
+                        </tr>
+                        <tr>
+                            <td>get_ci_status</td>
+                            <td>What is the CI status?</td>
+                            <td>Recent GitHub Actions runs</td>
+                        </tr>
+                        <tr>
+                            <td>get_test_results</td>
+                            <td>What failed in the last test run?</td>
+                            <td>Jobs and steps of the latest run</td>
+                        </tr>
+                        <tr>
+                            <td>get_pr_summary</td>
+                            <td>Which pull requests are open?</td>
+                            <td>Open pull requests and their reviews</td>
+                        </tr>
+                        <tr>
+                            <td>get_repo_activity</td>
+                            <td>What happened this week?</td>
+                            <td>Commits and issues over a number of days</td>
+                        </tr>
+                        <tr>
+                            <td>trace_breakage</td>
+                            <td>Who broke main?</td>
+                            <td>The last passing run, the first failing run, and the commits and files between them</td>
+                        </tr>
+                    </table>
+                    <p>trace_breakage hands that evidence to a language model, which names the commit most likely
+                        responsible. It reasons from commit messages and file names, so treat the answer as a lead to
+                        check.</p>
+                </div>
+            </section>
+
+            <section class="row" id="how">
+                <h2>How it works</h2>
+                <div>
+                    <ol>
+                        <li>Alexa+ sends a JSON-RPC message to the /mcp endpoint, using MCP 2025-11-25 over Streamable
+                            HTTP.</li>
+                        <li>The server calls the GitHub REST API with the token you provide.</li>
+                        <li>A language model (Gemini in the current version) shortens the result into spoken sentences.
+                            If the model fails, the server returns a few lines of the plain GitHub data.</li>
+                    </ol>
+                </div>
+            </section>
+
+            <section class="row" id="setup">
+                <h2>Setup</h2>
+                <div>
+                    <p>You need Python 3.12, a GitHub token with read access to the repositories you ask about, and a
+                        Gemini API key.</p>
+                    <span class="cap" style="margin-top:1rem">Windows (PowerShell)</span>
+                    <pre>git clone REPLACE_REPO_URL devpulse
+cd devpulse\server
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+copy ..\.env.example ..\.env
+python main.py</pre>
+                    <span class="cap" style="margin-top:1rem">macOS and Linux</span>
+                    <pre>git clone REPLACE_REPO_URL devpulse
+cd devpulse/server
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp ../.env.example ../.env
+python main.py</pre>
+                    <p>Put GITHUB_TOKEN, GEMINI_API_KEY and GEMINI_MODEL in the .env file, then open
+                        http://localhost:8000/simulator. To connect Alexa+, serve the /mcp endpoint over HTTPS.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer>
+        <div class="wrap">
+            <p><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="REPLACE_REPO_URL">Source</a>MIT
+                License</p>
+            <p>Built for the Amazon Developer Hackathon. Alexa and Alexa+ are trademarks of Amazon.com, Inc. DevPulse is
+                an independent project and is not endorsed by Amazon.</p>
+        </div>
+    </footer>
+</body>
+
+</html>
